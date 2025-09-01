@@ -1,12 +1,11 @@
 var express = require('express');
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 var cors = require('cors');
+var multer = require('multer');
 require('dotenv').config()
-
-mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true})
-
 var app = express();
+
+
+var upload = multer({ storage: multer.memoryStorage() });
 
 app.use(cors());
 app.use('/public', express.static(process.cwd() + '/public'));
@@ -17,6 +16,18 @@ app.get('/', function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
+
+app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
+  const nameOfFile = req.file.originalname;
+  const typeOfFile = req.file.mimetype;
+  const sizeOfFile = req.file.size;
+
+  res.status(200).json({
+    name: nameOfFile,
+    type: typeOfFile,
+    size: sizeOfFile
+  })
+})
 
 
 
